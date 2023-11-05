@@ -4,6 +4,7 @@ import time
 from flask import Flask, request, render_template, session, flash, redirect, \
     url_for, jsonify
 from celery import Celery
+from celery.result import AsyncResult
 
 
 app = Flask(__name__)
@@ -26,14 +27,14 @@ celery.conf.update(app.config)
 @celery.task(bind=True)
 def long_task(self):
     """Background task that runs a long function with progress reports."""
-    total = random.randint(10, 50)
+    total = random.randint(10, 30)
     for i in range(total):
         self.update_state(state='PROGRESS',
                           meta={'current': i, 'total': total,
                                 'status': 'Working on your task now...'})
         time.sleep(1)
     return {'current': 100, 'total': 100, 'status': 'Task completed!',
-            'result': 42}
+            'result': total}
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -59,6 +60,7 @@ def taskstatus(task_id):
             'total': 1,
             'status': 'Pending...'
         }
+    # running task    
     elif task.state != 'FAILURE':
         response = {
             'state': task.state,
@@ -80,4 +82,4 @@ def taskstatus(task_id):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
