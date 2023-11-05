@@ -18,7 +18,7 @@ app.config['CELERY_RESULT_BACKEND'] = 'redis://redis:6379/0'
 
 
 # Initialize Celery
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'], backend=app.config['CELERY_RESULT_BACKEND'])
 celery.conf.update(app.config)
 
 
@@ -45,7 +45,7 @@ def index():
 
 @app.route('/longtask', methods=['POST'])
 def longtask():
-    task = long_task.apply_async()
+    task = long_task.delay()
     return jsonify({}), 202, {'Location': url_for('taskstatus',
                                                   task_id=task.id)}
 
