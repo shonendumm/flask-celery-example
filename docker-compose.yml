@@ -11,7 +11,7 @@ services:
       context: .
       dockerfile: Dockerfile
     hostname: web
-    command: ./scripts/run_app.sh
+    command: ./scripts/run_app_copy.sh
     volumes:
       - .:/app
     ports:
@@ -24,7 +24,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ./scripts/run_celery.sh
+    command: ./scripts/run_celery_copy.sh
     volumes:
       - .:/app
     links:
